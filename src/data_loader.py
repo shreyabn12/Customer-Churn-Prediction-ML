@@ -63,35 +63,31 @@ def load_raw_data(path: str = 'C:/p/data/raw/Telco_customer_churn.xlsx') -> pd.D
 def get_feature_target_split(df: pd.DataFrame):
     """
     Separates the dataset into features (X) and target (y).
-    
-    We use 'churn_label' as target (Yes/No).
-    We drop columns that would leak information or are not useful for ML:
-    
-    - customer_id     : unique identifier, not a pattern
-    - count           : always 1, useless
-    - country, state  : everyone is from same region in this dataset
-    - lat_long        : raw string combining latitude and longitude
-    - churn_value     : this IS the target encoded as 0/1 — using it would be cheating
-    - churn_score     : a score already computed from churn, data leakage
-    - churn_reason    : only available AFTER someone churned, data leakage
-    - cltv            : customer lifetime value, can cause leakage
-    
-    Returns:
-        X (DataFrame): features only
-        y (Series): target column (churn_label)
+    Drops columns that cause data leakage or have no ML value.
     """
-    # Columns to drop — these either leak the answer or have no predictive value
     cols_to_drop = [
-        'customer_id', 'count', 'country', 'state',
-        'lat_long', 'churn_value', 'churn_score', 'churn_reason', 'cltv'
+        'customerid',    # unique ID — no pattern to learn
+        'count',         # always 1, useless
+        'country',       # everyone is USA
+        'state',         # everyone is California
+        'city',          # too many unique values, not useful
+        'zip_code',      # too granular
+        'latitude',      # raw geo coordinate
+        'longitude',     # raw geo coordinate
+        'lat_long',      # string combining lat+long
+        'churn_value',   # 0/1 encoding of our target — data leakage!
+        'churn_score',   # computed FROM churn — data leakage!
+        'churn_reason',  # only known AFTER churn — data leakage!
+        'cltv',          # customer lifetime value — leakage risk
     ]
-    
-    # Only drop columns that actually exist (defensive coding)
+
+    # Only drop columns that actually exist in the dataframe
+    # This prevents errors if some columns are missing
     cols_to_drop = [c for c in cols_to_drop if c in df.columns]
-    
+
     X = df.drop(columns=cols_to_drop + ['churn_label'])
     y = df['churn_label']  # 'Yes' or 'No'
-    
+
     print(f"[data_loader] Features shape: {X.shape}")
     print(f"[data_loader] Target shape: {y.shape}")
     print(f"[data_loader] Feature columns: {X.columns.tolist()}")
