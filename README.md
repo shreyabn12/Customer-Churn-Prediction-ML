@@ -83,7 +83,7 @@ The **summary plot** shows global feature importance across all test customers â
 
 **Clone the repository:**
 ```bash
-git clone https://github.com/YOUR_USERNAME/churn-prediction.git
+git clone https://github.com/shreyabn12/Customer-Churn-Prediction-ML.git
 cd churn-prediction
 ```
 
