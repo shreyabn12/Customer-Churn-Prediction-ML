@@ -47,14 +47,20 @@ def load_raw_data(path: str = 'C:/p/data/raw/Telco_customer_churn.xlsx') -> pd.D
     # 'Churn Label' -> 'churn_label'
     # 'Zip Code'    -> 'zip_code'
     # 'Total Charges' -> 'total_charges'
+   # Clean column names
     df.columns = (
         df.columns
-        .str.strip()           # remove leading/trailing spaces
-        .str.lower()           # make lowercase
-        .str.replace(' ', '_') # replace spaces with underscores
-        .str.replace('-', '_') # replace hyphens with underscores
+        .str.strip()
+        .str.lower()
+        .str.replace(' ', '_')
+        .str.replace('-', '_')
     )
-    
+
+    # Fix total_charges — Excel stores blank cells as empty strings
+    # pd.to_numeric with errors='coerce' converts blanks to NaN
+    # fillna(0) replaces NaN with 0 (brand new customers with no charges yet)
+    df['total_charges'] = pd.to_numeric(df['total_charges'], errors='coerce').fillna(0)
+
     print(f"[data_loader] Dataset loaded: {df.shape[0]} rows, {df.shape[1]} columns")
     print(f"[data_loader] Columns: {df.columns.tolist()}")
     return df
