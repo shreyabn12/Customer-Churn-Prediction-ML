@@ -1,9 +1,9 @@
-# dashboard/app.py
+# hf_deploy/app.py
 """
 Streamlit Interactive Dashboard for Customer Churn Prediction.
 
 Run with:
-    streamlit run dashboard/app.py
+    streamlit run hf_deploy/app.py
 
 The dashboard allows a user to enter customer details interactively
 and get an instant churn prediction with SHAP explanation.
@@ -42,6 +42,11 @@ def load_model():
         if os.path.exists(model_path):
             return joblib.load(model_path)
     raise FileNotFoundError("Model not found. Check models/ folder.")
+
+
+pipeline = load_model()
+preprocessor = pipeline.named_steps['preprocessor']
+classifier = pipeline.named_steps['classifier']
 
 
 # ── Feature engineering ───────────────────────────────────────────────────────
